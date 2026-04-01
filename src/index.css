@@ -100,3 +100,10 @@
     font-family: 'Space Grotesk', sans-serif;
   }
 }
+
+@media print {
+  #root {
+    display: none !important;
+  }
+}
+

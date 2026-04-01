@@ -15,6 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { PalletQrPrinter } from '@/components/PalletQrPrinter';
 
 type Status = 'idle' | 'processing' | 'done' | 'error';
 
@@ -324,12 +325,13 @@ const Index = () => {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 justify-end">
                     <Button variant="outline" onClick={handleResetPdf}>
                       Ler Outro PDF
                     </Button>
+                    <PalletQrPrinter results={results} />
                     <Button onClick={handleExport} variant={validationParams.hasGlobalErrors && csvData ? "secondary" : "default"}>
-                      <Download className="mr-2 h-4 w-4" /> Exportar para Excel
+                      <Download className="mr-2 h-4 w-4" /> Excel
                     </Button>
                   </div>
                 </div>
