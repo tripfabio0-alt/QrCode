@@ -215,7 +215,12 @@ const Index = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight">Pallet Reader</h1>
-              <p className="text-xs text-muted-foreground">Sistema Universal de Captura e Validação Livre</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-xs text-muted-foreground">Sistema Universal de Captura e Validação Livre</p>
+                <span className="text-[10px] font-mono bg-muted text-muted-foreground px-2 py-0.5 rounded-full border border-border" title={`Última atualização: ${__BUILD_DATE__}`}>
+                  v{__APP_VERSION__} • {__BUILD_DATE__.split(' ')[0]}
+                </span>
+              </div>
             </div>
           </div>
           
