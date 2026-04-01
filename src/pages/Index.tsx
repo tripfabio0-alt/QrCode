@@ -152,14 +152,23 @@ const Index = () => {
     return { duplicates, extraneos, hasError: duplicates.length > 0 || extraneos.length > 0 };
   }
 
-  // Scanner Logic
   const handleScannerKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       const val = e.currentTarget.value.trim();
-      if (val && val.length >= 6) { // Aceitar apenas tiros válidos de no mínimo 6 caracteres
-        setScannedSerials(prev => [val, ...prev]);
-        toast({ title: 'Adicionado', description: val, duration: 1500 });
+      if (val && val.length >= 6) { 
+        // Separa a string em múltiplos seriais caso seja o QR Code de um Pallet inteiro
+        const serials = val.split(';').map(s => s.trim()).filter(s => s.length >= 6);
+        
+        if (serials.length > 0) {
+          // Reverte os seriais ao juntar no histórico para que fiquem na ordem correta na visualização "mais recentes no topo"
+          setScannedSerials(prev => [...serials.reverse(), ...prev]);
+          if (serials.length > 1) {
+            toast({ title: 'Lote Capturado!', description: `${serials.length} seriais adicionados da etiqueta.`, duration: 2500 });
+          } else {
+            toast({ title: 'Adicionado', description: serials[0], duration: 1500 });
+          }
+        }
       }
       e.currentTarget.value = '';
     }
@@ -552,19 +561,22 @@ const Index = () => {
                     <CardHeader className="py-4 bg-muted/20 border-b">
                       <CardTitle className="text-sm font-medium">Histórico (Últimos tiros recebidos)</CardTitle>
                     </CardHeader>
-                    <CardContent className="p-0">
-                      <div className="flex flex-col max-h-[220px] overflow-y-auto">
-                        {scannedSerials.length === 0 ? (
-                          <div className="p-6 text-center text-muted-foreground text-sm">Nenhum bipe registrado</div>
-                        ) : (
-                          scannedSerials.map((s, i) => (
-                            <div key={i} className="flex justify-between items-center py-3 px-6 border-b border-border/50 last:border-0 hover:bg-muted/10 transition-colors">
-                              <span className="font-mono font-medium text-sm">{s}</span>
-                              <span className="text-xs text-muted-foreground">Pos: {scannedSerials.length - i}</span>
-                            </div>
-                          ))
-                        )}
-                      </div>
+                    <CardContent className="p-4">
+                      {scannedSerials.length === 0 ? (
+                        <div className="py-8 text-center text-muted-foreground text-sm">Nenhum bipe registrado</div>
+                      ) : (
+                        <div className="flex flex-wrap gap-1.5 max-h-[220px] overflow-y-auto content-start">
+                          {scannedSerials.map((s, i) => (
+                            <span 
+                              key={i} 
+                              className="px-1.5 py-0.5 bg-slate-100 text-slate-800 text-xs rounded border border-slate-200 font-mono shadow-sm"
+                              title={`Posição lida: ${scannedSerials.length - i}`}
+                            >
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </div>
