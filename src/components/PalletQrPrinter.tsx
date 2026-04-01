@@ -55,15 +55,15 @@ export function PalletQrPrinter({ results }: Props) {
       {/* ÁREA CARREGAMENTO DE QRs */}
       <div className="max-w-5xl mx-auto p-12 print:p-0 print:max-w-none">
         
-        {/* Usamos grid de 2 colunas para A4 cair perfeitamente (lado a lado) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 print:grid-cols-2 print:gap-x-6 print:gap-y-12 print:block">
+        {/* Layout modificado para 1 etiqueta por página na impressão (ideal para impressoras de Zebra) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 print:flex print:flex-col print:gap-0 print:m-0 print:p-0">
           {results.map((r, i) => {
-            const numPallet = r.palletInfo?.volume?.replace(/[^\d]/g, '') || String(i + 1);
+            const numPallet = r.palletInfo?.volume?.replace(/[^\d/]/g, '') || String(i + 1);
 
             return (
               <div 
                 key={i} 
-                className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-300 bg-slate-50 rounded-2xl print:border-solid print:border-black print:bg-white print:-mb-[2px] print:rounded-3xl print:break-inside-avoid print:page-break-inside-avoid print:h-auto break-inside-avoid"
+                className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-300 bg-slate-50 rounded-2xl print:border-none print:bg-white print:m-0 print:p-0 print:h-screen print:w-full print:break-after-page print:page-break-after-always break-inside-avoid print:break-inside-avoid"
               >
                 {/* 
                   O nível 'L' permite no máximo 7% de erro. Isso diminui os bytes extras de reparação, 
