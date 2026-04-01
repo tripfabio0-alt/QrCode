@@ -426,7 +426,7 @@ const Index = () => {
                 </Card>
 
                 {/* Divergences List Table */}
-                {((csvData && validationParams.hasGlobalErrors) || csvDuplicates.length > 0) && (
+                {(validationParams.hasGlobalErrors || csvDuplicates.length > 0) && (
                   <Card className="border-red-200 shadow-sm overflow-hidden">
                     <CardHeader className="bg-red-50/80 pb-4 border-b border-red-100">
                       <CardTitle className="text-base text-red-800 flex items-center">
@@ -435,7 +435,19 @@ const Index = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-6">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {validationParams.globalDuplicates.size > 0 && (
+                          <div>
+                            <h3 className="font-bold text-orange-900 text-sm mb-3">📦 Duplicidades Lidas nos Pallets</h3>
+                            <div className="flex flex-wrap gap-2">
+                              {Array.from(validationParams.globalDuplicates).map(s => (
+                                <span key={s} className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded border border-orange-200 font-mono shadow-sm">
+                                  {s}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                         {validationParams.missingInCsv.size > 0 && (
                           <div>
                             <h3 className="font-bold text-amber-900 text-sm mb-3">⚠️ Seriais Físicos (Não cadastrados no Arquivo de Ref)</h3>
