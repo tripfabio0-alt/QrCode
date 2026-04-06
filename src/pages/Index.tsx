@@ -224,6 +224,8 @@ const Index = () => {
     toast({ title: 'Relatório Criado', description: 'O download deve começar automaticamente.' });
   };
 
+  const progressPercent = progress.total > 0 ? (progress.current / progress.total) * 100 : 0;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -353,7 +355,7 @@ const Index = () => {
                       <Download className="mr-2 h-4 w-4" /> Excel
                     </Button>
                     <Button onClick={handleDownloadReport} variant="default" className="bg-blue-600 hover:bg-blue-700 text-white">
-                      <Printer className="mr-2 h-4 w-4" /> Baixar Relatório PDF
+                      <Download className="mr-2 h-4 w-4" /> Baixar Relatório PDF
                     </Button>
                   </div>
                 </div>
