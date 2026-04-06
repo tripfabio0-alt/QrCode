@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { processPDF, type PalletData } from '@/lib/pdf-processor';
 import { exportToExcel } from '@/lib/excel-export';
 import { toast } from '@/hooks/use-toast';
+import { generateAuditReport } from '@/lib/pdf-report-generator';
 import {
   Tooltip,
   TooltipContent,
@@ -212,94 +213,19 @@ const Index = () => {
     setCsvDuplicates([]);
   }
 
-  const progressPercent = progress.total > 0 ? (progress.current / progress.total) * 100 : 0;
+  const handleDownloadReport = () => {
+    generateAuditReport({
+      results,
+      fileName,
+      csvFileName,
+      validationParams,
+      csvDuplicates
+    });
+    toast({ title: 'Relatório Criado', description: 'O download deve começar automaticamente.' });
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* RECIBO OCULTO (Só aparece na hora da impressão) */}
-      <div className="hidden print:block p-8 bg-white text-black font-sans w-full max-w-4xl mx-auto">
-        <div className="border-b-2 border-slate-300 pb-4 mb-6 flex justify-between items-end">
-          <div>
-            <h1 className="text-2xl font-black mb-1 uppercase text-slate-800">Recibo de Auditoria Lote</h1>
-            <p className="text-sm text-slate-500">Sistema Universal de Captura e Validação</p>
-          </div>
-          <div className="text-right">
-            <p className="font-bold text-slate-700">{new Date().toLocaleString('pt-BR')}</p>
-          </div>
-        </div>
-
-        <div className="mb-6 bg-slate-100 p-4 rounded-lg border border-slate-200">
-          <p className="mb-1 text-sm"><span className="font-bold text-slate-700">Arquivo Lote Analisado:</span> {fileName || "N/A"}</p>
-          <p className="text-sm"><span className="font-bold text-slate-700">Base de Referência (Mestre):</span> {csvFileName || "Não fornecido (Sem cruzamento)"}</p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="p-4 border border-slate-200 rounded-lg text-center">
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Total de Pallets Lidos</p>
-            <p className="text-2xl font-black mt-2">{results.length}</p>
-          </div>
-          <div className="p-4 border border-slate-200 rounded-lg text-center">
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Aparelhos Identificados</p>
-            <p className="text-2xl font-black mt-2">{validationParams.totalPdfSerials}</p>
-          </div>
-        </div>
-
-        {/* Conclusion */}
-        <div className={`p-6 rounded-lg text-center border-2 mb-8 ${!validationParams.hasGlobalErrors && csvData ? 'border-green-600 bg-green-50' : (validationParams.hasGlobalErrors ? 'border-red-600 bg-red-50' : 'border-slate-400 bg-slate-50')}`}>
-          <h2 className={`text-2xl font-black uppercase tracking-tight ${!validationParams.hasGlobalErrors && csvData ? 'text-green-700' : (validationParams.hasGlobalErrors ? 'text-red-700' : 'text-slate-700')}`}>
-            {!csvData 
-              ? "CONFERÊNCIA INCOMPLETA (SEM TXT MESTRE)" 
-              : (!validationParams.hasGlobalErrors 
-                  ? "✓ NENHUMA DIVERGÊNCIA ENCONTRADA" 
-                  : "⚠ DIVERGÊNCIAS DETECTADAS")}
-          </h2>
-          {!validationParams.hasGlobalErrors && csvData && (
-             <p className="mt-2 text-green-800 font-medium">Os volumes físicos coincidem estritamente com a base vinculada.</p>
-          )}
-        </div>
-
-        {/* Breakdown of Errors */}
-        {(validationParams.hasGlobalErrors || csvDuplicates.length > 0) && (
-          <div className="mt-6 border border-red-200 p-5 rounded-lg bg-red-50/50">
-            <h3 className="font-bold text-red-900 border-b border-red-200 pb-2 mb-4">Relatório de Ocorrências</h3>
-            <div className="space-y-4">
-              {validationParams.globalDuplicates.size > 0 && (
-                <div>
-                  <p className="font-bold text-orange-800 mb-1">Duplicidades dentro do Lote (PDF) ({validationParams.globalDuplicates.size})</p>
-                  <p className="text-xs font-mono text-orange-900">{Array.from(validationParams.globalDuplicates).join(', ')}</p>
-                </div>
-              )}
-              {validationParams.missingInCsv.size > 0 && (
-                <div>
-                  <p className="font-bold text-amber-800 mb-1">Extrafísico: Sobrando nos Pallets ({validationParams.missingInCsv.size})</p>
-                  <p className="text-xs font-mono text-amber-900">{Array.from(validationParams.missingInCsv).join(', ')}</p>
-                </div>
-              )}
-              {validationParams.missingInPdf.size > 0 && (
-                <div>
-                  <p className="font-bold text-red-800 mb-1">Ausentes: Faltando no Lote PDF ({validationParams.missingInPdf.size})</p>
-                  <p className="text-xs font-mono text-red-900">{Array.from(validationParams.missingInPdf).join(', ')}</p>
-                </div>
-              )}
-              {csvDuplicates.length > 0 && (
-                <div>
-                  <p className="font-bold text-purple-800 mb-1">Duplicidades Nativas do TXT Mestre ({csvDuplicates.length})</p>
-                  <p className="text-xs font-mono text-purple-900">{csvDuplicates.join(', ')}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        <div className="mt-16 border-t border-slate-300 pt-8 flex text-xs text-slate-500 font-medium flex-col items-center">
-          <p className="mb-8">Autenticação do Sistema Automático</p>
-          <div className="border-t border-black pt-2 w-64 text-center mt-6 text-black">
-             Assinatura do Auditor Analista
-          </div>
-        </div>
-      </div>
-
-      <div className="print:hidden">
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-6xl flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4">
@@ -426,8 +352,8 @@ const Index = () => {
                     <Button onClick={handleExport} variant={validationParams.hasGlobalErrors && csvData ? "secondary" : "default"}>
                       <Download className="mr-2 h-4 w-4" /> Excel
                     </Button>
-                    <Button onClick={() => window.print()} variant="default" className="bg-blue-600 hover:bg-blue-700 text-white">
-                      <Printer className="mr-2 h-4 w-4" /> Gerar Recibo PDF
+                    <Button onClick={handleDownloadReport} variant="default" className="bg-blue-600 hover:bg-blue-700 text-white">
+                      <Printer className="mr-2 h-4 w-4" /> Baixar Relatório PDF
                     </Button>
                   </div>
                 </div>
@@ -741,7 +667,6 @@ const Index = () => {
           </TabsContent>
         </Tabs>
       </main>
-      </div>
     </div>
   );
 };
