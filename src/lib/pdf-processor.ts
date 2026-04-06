@@ -57,7 +57,7 @@ async function extractTextFromPage(pdf: pdfjsLib.PDFDocumentProxy, pageNum: numb
 
 function parsePalletInfo(text: string): PalletInfo {
   // Extract Volume field which contains pallet number like "1/30"
-  const volumeMatch = text.match(/Volume[:\s]*(\d+\/\d+)/i);
+  const volumeMatch = text.match(/Volume[\s\S]{0,50}?(\d+\/\d+)(?!\/\d)/i);
   const quantidadeMatch = text.match(/Quantidade[:\s]*(\d+)/i);
   const notaFiscalMatch = text.match(/Nota\s*Fiscal[:\s]*(\d+)/i);
   const pedidoMatch = text.match(/Pedido\s*Zenner[:\s]*(\d+)/i);
