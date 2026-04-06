@@ -98,8 +98,8 @@ async function renderPageToCanvasContext(pdf: pdfjsLib.PDFDocumentProxy, pageNum
 }
 
 async function readQRCodesFromPage(pdf: pdfjsLib.PDFDocumentProxy, pageNum: number): Promise<string[]> {
-  // Try multiple scales - dense QR codes need the right resolution
-  const scales = [2, 3, 1.5, 4];
+  // Tenta múltiplas escalas, incluindo resoluções mais altas e intermediárias para lidar com variação de renderização (aliasing) do jsQR.
+  const scales = [2, 2.5, 3, 3.5, 4, 4.5, 5, 1.5];
   for (const scale of scales) {
     try {
       const { ctx, width, height } = await renderPageToCanvasContext(pdf, pageNum, scale);
